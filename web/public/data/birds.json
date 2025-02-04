@@ -1,14 +1,66 @@
 [
-    {
-      "sciName": "Chamaea fasciata",
-      "dateTime": "2024-02-03 14:30"
-    },
-    {
-      "sciName": "Turdus migratorius",
-      "dateTime": "2024-02-02 09:15"
-    },
-    {
-      "sciName": "Cyanocitta cristata",
-      "dateTime": "2024-02-01 18:45"
-    }
-  ]
+  {
+    "name": "American Robin",
+    "sciName": "Turdus migratorius",
+    "lat": 44.3106,
+    "lng": -69.7795,
+    "dateTime": "2024-02-03 14:30"
+  },
+  {
+    "name": "Blue Jay",
+    "sciName": "Cyanocitta cristata",
+    "lat": 42.3601,
+    "lng": -71.0589,
+    "dateTime": "2024-02-02 09:15"
+  },
+  {
+    "name": "Northern Cardinal",
+    "sciName": "Cardinalis cardinalis",
+    "lat": 40.7128,
+    "lng": -74.0060,
+    "dateTime": "2024-02-01 18:45"
+  },
+  {
+    "name": "Baltimore Oriole",
+    "sciName": "Icterus galbula",
+    "lat": 39.2904,
+    "lng": -76.6122,
+    "dateTime": "2024-02-04 12:10"
+  },
+  {
+    "name": "Black-capped Chickadee",
+    "sciName": "Poecile atricapillus",
+    "lat": 43.6591,
+    "lng": -70.2568,
+    "dateTime": "2024-02-05 08:30"
+  },
+  {
+    "name": "Eastern Bluebird",
+    "sciName": "Sialia sialis",
+    "lat": 41.7637,
+    "lng": -72.6851,
+    "dateTime": "2024-02-06 15:20"
+  },
+ 
+  {
+    "name": "Tufted Titmouse",
+    "sciName": "Baeolophus bicolor",
+    "lat": 40.4406,
+    "lng": -79.9959,
+    "dateTime": "2024-02-08 07:55"
+  },
+  {
+    "name": "White-throated Sparrow",
+    "sciName": "Zonotrichia albicollis",
+    "lat": 42.6526,
+    "lng": -73.7562,
+    "dateTime": "2024-02-09 16:40"
+  },
+  {
+    "name": "American Goldfinch",
+    "sciName": "Spinus tristis",
+    "lat": 44.5588,
+    "lng": -72.5778,
+    "dateTime": "2024-02-10 13:10"
+  }
+]
