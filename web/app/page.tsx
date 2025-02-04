@@ -15,9 +15,9 @@ import { MediaDeviceFailure } from "livekit-client"
 import type { ConnectionDetails } from "./api/connection-details/route"
 import { useKrispNoiseFilter } from "@livekit/components-react/krisp"
 import Carousel from "../components/Carousel"
+import BirdGrid from "@/components/BirdGrid"
 
 const birdData = [
-  { sciName: "Chamaea fasciata", dateTime: "2024-02-03 14:30" },
   { sciName: "Turdus migratorius", dateTime: "2024-02-02 09:15" },
   { sciName: "Cyanocitta cristata", dateTime: "2024-02-01 18:45" },
   { sciName: "Cardinalis cardinalis", dateTime: "2024-02-05 08:20" },
@@ -26,11 +26,9 @@ const birdData = [
   { sciName: "Zonotrichia leucophrys", dateTime: "2024-02-03 21:30" },
   { sciName: "Sitta carolinensis", dateTime: "2024-02-07 07:45" },
   { sciName: "Spinus tristis", dateTime: "2024-02-06 16:10" },
-  { sciName: "Picoides pubescens", dateTime: "2024-02-05 13:40" },
   { sciName: "Baeolophus bicolor", dateTime: "2024-02-06 12:10" },
   { sciName: "Zonotrichia leucophrys", dateTime: "2024-02-03 21:30" },
   { sciName: "Spinus tristis", dateTime: "2024-02-06 16:10" },
-  { sciName: "Picoides pubescens", dateTime: "2024-02-05 13:40" },
 ]
 
 export default function Page() {
@@ -51,7 +49,7 @@ export default function Page() {
   }, [])
 
   return (
-    <main data-lk-theme="light" className=" bg-white text-black">
+    <main className="bg-darkBlue text-white min-h-screen">
       <LiveKitRoom
         token={connectionDetails?.participantToken}
         serverUrl={connectionDetails?.serverUrl}
@@ -64,12 +62,9 @@ export default function Page() {
         }}
         className="grid grid-rows-[2fr_1fr] items-center"
       />
-      <div
-        className="h-screen flex items-center justify-end bg-gray-100 p-10 gap-5
-      "
-      >
-        <div className="h-5/6 p-2 w-full outline-dashed"> cheese</div>
-        <Carousel birds={birdData}></Carousel>
+      <div className="h-screen flex-col items-center justify-end bg-darkBlue p-10 gap-5">
+        <div className="h-[50px]">heading</div>
+        <BirdGrid birds={birdData}></BirdGrid>
       </div>
     </main>
   )

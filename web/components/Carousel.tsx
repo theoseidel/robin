@@ -2,8 +2,8 @@ import { useState, useRef, useEffect } from "react"
 import { motion } from "framer-motion"
 import Thumbnail from "./Thumbnail"
 
-const API_BASE = "https://nuthatch.lastelm.software/v2/birds?sciName="
-const API_KEY = "0c69afd9-add3-401e-a2af-9d8f42950985"
+const API_BASE = process.env.NEXT_PUBLIC_BIRD_API_BASE_URL
+const API_KEY = process.env.NEXT_PUBLIC_BIRD_API_KEY || ""
 
 interface Bird {
   sciName: string
@@ -13,6 +13,7 @@ interface Bird {
 interface BirdDetails {
   commonName?: string
   imageUrl: string | null
+  loading: boolean
 }
 
 interface CarouselProps {
@@ -22,7 +23,16 @@ interface CarouselProps {
 export default function Carousel({ birds }: CarouselProps) {
   const [birdDetails, setBirdDetails] = useState<{
     [key: string]: BirdDetails
-  }>({})
+  }>(() =>
+    birds.reduce((acc, bird) => {
+      acc[bird.sciName] = {
+        imageUrl: null,
+        commonName: bird.sciName,
+        loading: true,
+      }
+      return acc
+    }, {} as { [key: string]: BirdDetails })
+  )
   const carouselRef = useRef<HTMLDivElement>(null)
 
   // Sort birds by date (newest first)
@@ -49,35 +59,23 @@ export default function Carousel({ birds }: CarouselProps) {
 
             const data = await response.json()
 
-            if (
-              !data ||
-              !Array.isArray(data.entities) ||
-              data.entities.length === 0
-            ) {
-              newBirdDetails[bird.sciName] = {
-                imageUrl: null,
-                commonName: bird.sciName,
-              }
-            } else {
-              newBirdDetails[bird.sciName] = {
-                imageUrl:
-                  data.entities[0].images.length > 0
-                    ? data.entities[0].images[0]
-                    : null,
-                commonName: data.entities[0].comName || bird.sciName,
-              }
+            newBirdDetails[bird.sciName] = {
+              imageUrl: data.entities?.[0]?.images?.[0] || null,
+              commonName: data.entities?.[0]?.comName || bird.sciName,
+              loading: false,
             }
           } catch (error) {
             console.error(`Error fetching data for ${bird.sciName}:`, error)
             newBirdDetails[bird.sciName] = {
               imageUrl: null,
               commonName: bird.sciName,
+              loading: false,
             }
           }
         })
       )
 
-      setBirdDetails(newBirdDetails)
+      setBirdDetails((prev) => ({ ...prev, ...newBirdDetails }))
     }
 
     fetchBirdDetails()
@@ -89,10 +87,10 @@ export default function Carousel({ birds }: CarouselProps) {
   const scrollableHeight = sortedBirds.length * thumbnailHeight - visibleHeight // Total scrollable area
 
   return (
-    <div className=" h-5/6 p-2 flex justify-center outline-dotted">
+    <div className="h-5/6 p-2 flex justify-center outline-dotted">
       <div
         ref={carouselRef}
-        className="  w-[140px] overflow-hidden overflow-y-auto"
+        className="w-[140px] overflow-hidden overflow-y-auto"
       >
         {/* Draggable Thumbnails */}
         <motion.div
@@ -105,6 +103,7 @@ export default function Carousel({ birds }: CarouselProps) {
               key={index}
               imageUrl={birdDetails[bird.sciName]?.imageUrl}
               commonName={birdDetails[bird.sciName]?.commonName}
+              loading={birdDetails[bird.sciName]?.loading}
               date={bird.dateTime}
               onClick={() => {}}
             />

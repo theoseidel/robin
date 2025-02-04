@@ -6,7 +6,14 @@ const config: Config = {
     "./components/**/*.{js,ts,jsx,tsx,mdx}",
     "./app/**/*.{js,ts,jsx,tsx,mdx}",
   ],
-  theme: {},
+  theme: {
+    extend: {
+      colors: {
+        darkBlue: "161b26", // Adjust this to match the Audubon theme
+        accentBlue: "#262a36",
+      },
+    },
+  },
   plugins: [],
 };
 export default config;
