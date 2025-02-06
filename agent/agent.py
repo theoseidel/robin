@@ -71,7 +71,7 @@ def run_bird_expert_agent(ctx: JobContext, participant: rtc.RemoteParticipant):
     session.conversation.item.create(
         llm.ChatMessage(
             role="assistant",
-            content="Hello! I'm your bird expert assistant. I'd be happy to help you learn about birds, identify species, or answer any questions you have about our feathered friends. What would you like to know?",
+            content="Hello! I'm your bird expert assistant. I'd be happy to help you learn about birds, identify species, or answer any questions you have.",
         )
     )
     session.response.create()
