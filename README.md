@@ -8,8 +8,6 @@ ROBIN is a full-stack application for exploring and learning about bird sighting
 - 🗺️ Location mapping for each sighting
 - 🤖 AI-powered bird expert chat assistant
 - 🔍 Search and filter capabilities
-- 📱 Responsive design
-- 🎨 Beautiful loading animations
 
 ## Tech Stack
 
