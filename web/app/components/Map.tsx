@@ -5,52 +5,70 @@ import "mapbox-gl/dist/mapbox-gl.css"
 // Set your Mapbox token with the correct env variable name
 mapboxgl.accessToken = process.env.NEXT_PUBLIC_MAPBOX_ACCESS_TOKEN!
 
-interface MapProps {
+type Bird = {
   lat: number
   lng: number
-  isLoading?: boolean
+  name: string
+  dateTime: string
 }
 
-export default function Map({ lat, lng, isLoading = false }: MapProps) {
+interface MapProps {
+  selectedItem: Bird
+  className?: string
+}
+
+export default function Map({ selectedItem, className = "" }: MapProps) {
   const mapContainer = useRef<HTMLDivElement>(null)
   const map = useRef<mapboxgl.Map | null>(null)
+  const marker = useRef<mapboxgl.Marker | null>(null)
 
   useEffect(() => {
-    if (!mapContainer.current || isLoading) return
+    if (!mapContainer.current) return
 
-    map.current = new mapboxgl.Map({
-      container: mapContainer.current,
-      style: "mapbox://styles/mapbox/navigation-night-v1",
-      center: [lng, lat],
+    if (!map.current) {
+      map.current = new mapboxgl.Map({
+        container: mapContainer.current,
+        style: "mapbox://styles/mapbox/dark-v11",
+        center: [selectedItem.lng, selectedItem.lat],
+        zoom: 12,
+      })
+
+      map.current.addControl(new mapboxgl.NavigationControl())
+    }
+
+    // Update or create marker
+    if (!marker.current) {
+      marker.current = new mapboxgl.Marker()
+        .setLngLat([selectedItem.lng, selectedItem.lat])
+        .setPopup(
+          new mapboxgl.Popup({ offset: 25 }).setHTML(`
+            <div class="p-2">
+              <h3 class="font-bold">${selectedItem.name}</h3>
+              <p class="text-sm">${new Date(
+                selectedItem.dateTime
+              ).toLocaleDateString()}</p>
+            </div>
+          `)
+        )
+        .addTo(map.current)
+    } else {
+      marker.current.setLngLat([selectedItem.lng, selectedItem.lat])
+    }
+
+    // Fly to new location
+    map.current.flyTo({
+      center: [selectedItem.lng, selectedItem.lat],
       zoom: 12,
+      duration: 2000,
     })
 
-    map.current.addControl(new mapboxgl.NavigationControl())
-
-    new mapboxgl.Marker({ color: "#FF0000" })
-      .setLngLat([lng, lat])
-      .setPopup(new mapboxgl.Popup().setHTML("Sighting location"))
-      .addTo(map.current)
-
     return () => {
-      map.current?.remove()
+      if (marker.current) {
+        marker.current.remove()
+        marker.current = null
+      }
     }
-  }, [lat, lng, isLoading])
+  }, [selectedItem])
 
-  if (isLoading) {
-    return (
-      <div className="relative w-full h-full rounded-lg overflow-hidden bg-gray-800/50 flex items-center justify-center">
-        <div className="flex flex-col items-center gap-2">
-          <div className="animate-spin text-2xl">⟳</div>
-          <p className="text-sm text-gray-400">Loading map...</p>
-        </div>
-      </div>
-    )
-  }
-
-  return (
-    <div className="relative w-full h-full rounded-lg overflow-hidden">
-      <div ref={mapContainer} className="w-full h-full" />
-    </div>
-  )
+  return <div ref={mapContainer} className={className} />
 }

@@ -11,91 +11,85 @@ export default function FilterBar({
   onDateRangeChange,
   onSearch,
 }: FilterBarProps) {
-  const [sortDirection, setSortDirection] = useState<"asc" | "desc">("desc")
-  const [dateRange, setDateRange] = useState({ start: "", end: "" })
+  const [startDate, setStartDate] = useState("")
+  const [endDate, setEndDate] = useState("")
   const [searchQuery, setSearchQuery] = useState("")
 
-  const handleSearch = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setSearchQuery(e.target.value)
-    onSearch(e.target.value)
-  }
-
-  const handleSortChange = () => {
-    const newDirection = sortDirection === "asc" ? "desc" : "asc"
-    setSortDirection(newDirection)
-    onSortChange(newDirection)
-  }
-
-  const handleDateChange = (type: "start" | "end", value: string) => {
-    const newRange = { ...dateRange, [type]: value }
-    setDateRange(newRange)
-    onDateRangeChange(newRange)
-  }
-
-  const handleClearFilters = () => {
-    setSortDirection("desc")
-    setDateRange({ start: "", end: "" })
+  const clearSearch = () => {
     setSearchQuery("")
-    onSortChange("desc")
-    onDateRangeChange({ start: "", end: "" })
     onSearch("")
   }
 
+  const clearDates = () => {
+    setStartDate("")
+    setEndDate("")
+    onDateRangeChange({ start: "", end: "" })
+  }
+
   return (
-    <div className="w-full bg-gray-800/50 rounded-lg border border-gray-700 p-4">
-      <div className="flex flex-wrap gap-4 items-center justify-between">
-        <div className="flex flex-wrap items-center gap-4">
-          <div className="flex items-center gap-4">
-            <h3 className="text-lg font-semibold whitespace-nowrap">Search</h3>
-            <input
-              type="text"
-              value={searchQuery}
-              onChange={handleSearch}
-              placeholder="Search birds..."
-              className="px-3 py-2 bg-gray-700/50 rounded-md text-white min-w-[200px] focus:outline-none focus:ring-2 focus:ring-blue-500"
-            />
-          </div>
-
-          <div className="flex items-center gap-4">
-            <h3 className="text-lg font-semibold whitespace-nowrap">
-              Sort by Date
-            </h3>
-            <button
-              onClick={handleSortChange}
-              className="flex items-center gap-2 px-3 py-2 bg-gray-700/50 rounded-md hover:bg-gray-700 transition-colors"
-            >
-              {sortDirection === "asc" ? "↑" : "↓"}
-            </button>
-          </div>
-
-          <div className="flex flex-wrap items-center gap-4">
-            <h3 className="text-lg font-semibold whitespace-nowrap">
-              Date Range
-            </h3>
-            <div className="flex gap-2">
-              <input
-                type="date"
-                value={dateRange.start}
-                onChange={(e) => handleDateChange("start", e.target.value)}
-                className="px-3 py-2 bg-gray-700/50 rounded-md text-white min-w-0"
-              />
-              <input
-                type="date"
-                value={dateRange.end}
-                onChange={(e) => handleDateChange("end", e.target.value)}
-                className="px-3 py-2 bg-gray-700/50 rounded-md text-white min-w-0"
-              />
-            </div>
-          </div>
-        </div>
-
-        <button
-          onClick={handleClearFilters}
-          className="px-4 py-2 bg-gray-700/50 rounded-md hover:bg-gray-700 transition-colors text-sm font-medium"
-        >
-          Clear Filters
-        </button>
+    <div className="bg-gray-800/30 rounded-lg p-3 border border-gray-700/50 space-y-3">
+      {/* Search with clear button */}
+      <div className="relative">
+        <input
+          type="text"
+          placeholder="Search birds..."
+          className="w-full bg-gray-900/50 rounded px-3 py-1.5 text-sm border border-gray-700/50 focus:outline-none focus:border-blue-500/50 pr-8"
+          value={searchQuery}
+          onChange={(e) => {
+            setSearchQuery(e.target.value)
+            onSearch(e.target.value)
+          }}
+        />
+        {searchQuery && (
+          <button
+            onClick={clearSearch}
+            className="absolute right-2 top-1/2 -translate-y-1/2 text-gray-400 hover:text-white"
+            aria-label="Clear search"
+          >
+            ×
+          </button>
+        )}
       </div>
+
+      {/* Date Range with clear button */}
+      <div className="relative flex gap-2 text-sm">
+        <input
+          type="date"
+          className="flex-1 bg-gray-900/50 rounded px-2 py-1 border border-gray-700/50 focus:outline-none focus:border-blue-500/50"
+          value={startDate}
+          onChange={(e) => {
+            setStartDate(e.target.value)
+            onDateRangeChange({ start: e.target.value, end: endDate })
+          }}
+        />
+        <input
+          type="date"
+          className="flex-1 bg-gray-900/50 rounded px-2 py-1 border border-gray-700/50 focus:outline-none focus:border-blue-500/50"
+          value={endDate}
+          onChange={(e) => {
+            setEndDate(e.target.value)
+            onDateRangeChange({ start: startDate, end: e.target.value })
+          }}
+        />
+        {(startDate || endDate) && (
+          <button
+            onClick={clearDates}
+            className="absolute right-[-24px] top-1/2 -translate-y-1/2 text-gray-400 hover:text-white p-1"
+            aria-label="Clear dates"
+          >
+            ×
+          </button>
+        )}
+      </div>
+
+      {/* Sort */}
+      <select
+        onChange={(e) => onSortChange(e.target.value as "asc" | "desc")}
+        className="w-full bg-gray-900/50 rounded px-3 py-1.5 text-sm border border-gray-700/50 focus:outline-none focus:border-blue-500/50"
+      >
+        <option value="desc">Latest First</option>
+        <option value="asc">Oldest First</option>
+      </select>
     </div>
   )
 }
