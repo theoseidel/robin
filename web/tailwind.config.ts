@@ -14,6 +14,7 @@ const config: Config = {
       },
     },
   },
-  plugins: [],
+  plugins: [require('tailwind-scrollbar')],
+  important: true, // This helps prevent Mapbox styles from being overridden
 };
 export default config;

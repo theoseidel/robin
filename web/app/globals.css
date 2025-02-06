@@ -6,3 +6,17 @@ html, body {
   background-color: #111827 !important; /* Force dark blue */
   color: white;
 }
+
+
+.mapboxgl-ctrl-group {
+  background-color: rgba(31, 41, 55, 0.8) !important;
+  backdrop-filter: blur(4px);
+}
+
+.mapboxgl-ctrl button {
+  color: white !important;
+}
+
+.mapboxgl-ctrl-group button {
+  border-color: rgba(75, 85, 99, 0.4) !important;
+}
