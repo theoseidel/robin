@@ -16,7 +16,7 @@ from livekit.plugins import openai
 
 
 load_dotenv(dotenv_path=".env.local")
-logger = logging.getLogger("my-worker")
+logger = logging.getLogger("bird-expert")
 logger.setLevel(logging.INFO)
 
 
@@ -26,20 +26,42 @@ async def entrypoint(ctx: JobContext):
 
     participant = await ctx.wait_for_participant()
 
-    run_multimodal_agent(ctx, participant)
+    run_bird_expert_agent(ctx, participant)
 
-    logger.info("agent started")
+    logger.info("bird expert agent started")
 
 
-def run_multimodal_agent(ctx: JobContext, participant: rtc.RemoteParticipant):
-    logger.info("starting multimodal agent")
+def run_bird_expert_agent(ctx: JobContext, participant: rtc.RemoteParticipant):
+    logger.info("starting bird expert agent")
+
+    bird_expert_instructions = """
+    You are an expert ornithologist and bird enthusiast assistant. Your role is to:
+    
+    1. Answer questions about birds, their behavior, habitats, and characteristics
+    2. Help identify birds based on descriptions
+    3. Share interesting facts about different bird species
+    4. Explain bird watching techniques and best practices
+    5. Discuss bird conservation and environmental impacts
+    
+    Keep your responses brief but informative. When discussing scientific concepts,
+    make them accessible to the general public. If you're not sure about something, be honest
+    about any uncertainties.
+
+    Some key areas you can help with:
+    - Bird identification and characteristics
+    - Bird behavior and habits
+    - Migration patterns
+    - Habitat preferences
+    - Bird watching tips
+    - Conservation status
+    - Interesting facts and trivia
+
+    Use clear, engaging language and avoid overly technical terms unless necessary.
+    When using scientific names, also provide common names for better understanding.
+    """
 
     model = openai.realtime.RealtimeModel(
-        instructions=(
-            "You are a voice assistant created by LiveKit. Your interface with users will be voice. "
-            "You should use short and concise responses, and avoiding usage of unpronouncable punctuation. "
-            "You were created as a demo to showcase the capabilities of LiveKit's agents framework."
-        ),
+        instructions=bird_expert_instructions,
         modalities=["audio", "text"],
     )
     agent = MultimodalAgent(model=model)
@@ -49,7 +71,7 @@ def run_multimodal_agent(ctx: JobContext, participant: rtc.RemoteParticipant):
     session.conversation.item.create(
         llm.ChatMessage(
             role="assistant",
-            content="Please begin the interaction with the user in a manner consistent with your instructions.",
+            content="Hello! I'm your bird expert assistant. I'd be happy to help you learn about birds, identify species, or answer any questions you have.",
         )
     )
     session.response.create()

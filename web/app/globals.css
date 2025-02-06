@@ -7,7 +7,6 @@ html, body {
   color: white;
 }
 
-
 .mapboxgl-ctrl-group {
   background-color: rgba(31, 41, 55, 0.8) !important;
   backdrop-filter: blur(4px);
@@ -19,4 +18,87 @@ html, body {
 
 .mapboxgl-ctrl-group button {
   border-color: rgba(75, 85, 99, 0.4) !important;
+}
+
+/* Add these styles for the device selection popup */
+[role="listbox"] {
+  @apply bg-gray-800 border border-gray-700 rounded-lg shadow-lg;
+}
+
+[role="option"] {
+  @apply text-white hover:bg-gray-700 px-4 py-2 cursor-pointer;
+}
+
+[role="option"][aria-selected="true"] {
+  @apply bg-gray-700;
+}
+
+@import url('https://fonts.googleapis.com/css?family=Arima+Madurai:300');
+
+.text-shadow-light {
+  text-shadow: 0px 1px 1px rgba(255,255,255,0.6);
+}
+
+.bird {
+  background-image: url('https://s3-us-west-2.amazonaws.com/s.cdpn.io/174479/bird-cells-new.svg');
+  background-size: auto 100%;
+  width: 88px;
+  height: 125px;
+  will-change: background-position;
+  animation: fly-cycle 1s steps(5) infinite;
+}
+
+@keyframes fly-cycle {
+  100% {
+    background-position: -460px 0; /* 92px * 5 = 460px */
+  }
+}
+
+.bird-container {
+  position: absolute;
+  top: 20%;
+  left: -10%;
+  will-change: transform;
+  transform-origin: 50% 50%;
+}
+
+.bird-container::before {
+  content: '';
+  position: absolute;
+  width: 100%;
+  height: 20px;
+  background: radial-gradient(ellipse at center, rgba(0,0,0,0.2) 0%, rgba(0,0,0,0) 60%);
+  bottom: -20px;
+  left: 0;
+  filter: blur(2px);
+  transform: scale(0.8);
+  opacity: 0.5;
+  animation: shadow-pulse 2s ease-in-out infinite;
+}
+
+@keyframes shadow-pulse {
+  0%, 100% { opacity: 0.5; transform: scale(0.8); }
+  50% { opacity: 0.3; transform: scale(0.6); }
+}
+
+@property --figure-eight-progress {
+  syntax: '<number>';
+  initial-value: 0;
+  inherits: false;
+}
+
+.bird-loop {
+  offset-path: circle(200px at center);
+  offset-rotate: auto 90deg;
+}
+
+/* Update show-path styling for better visibility */
+.show-path path {
+  stroke: rgba(255, 255, 255, 0.1);
+  stroke-width: 2;
+}
+
+/* Optional: Add this if you want to see the container bounds */
+.debug-container {
+  border: 1px dashed rgba(255, 255, 255, 0.2);
 }

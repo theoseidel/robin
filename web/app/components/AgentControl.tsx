@@ -32,7 +32,7 @@ export default function AgentControl() {
 
   return (
     <div className="w-full max-w-md mx-auto">
-      <div className="h-[300px]">
+      <div className="">
         <BarVisualizer
           state={state}
           barCount={5}
@@ -42,7 +42,7 @@ export default function AgentControl() {
         />
       </div>
 
-      <div className="relative h-[100px]">
+      <div className="relative ">
         <AnimatePresence>
           {agentState === "disconnected" && (
             <motion.button

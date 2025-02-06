@@ -1,9 +1,13 @@
 "use client"
 
 import { useEffect, useState } from "react"
+import { useBirds } from "./hooks/useBirds"
 import Gallery from "./components/Gallery"
 import InfoCard from "./components/InfoCard"
 import FilterBar from "./components/FilterBar"
+import RobinLoader from "./components/RobinLoader"
+import AnimatedHeader from "./components/AnimatedHeader"
+import { ErrorBoundary } from "./components/ErrorBoundary"
 
 type Bird = {
   id: number
@@ -49,169 +53,83 @@ const getWikimediaImage = async (sciName: string): Promise<string> => {
 }
 
 export default function Page() {
-  const [birds, setBirds] = useState<Bird[]>([]) // Currently displayed birds
-  const [allBirds, setAllBirds] = useState<Bird[]>([]) // Original complete dataset
-  const [filteredBirds, setFilteredBirds] = useState<Bird[]>([]) // Filtered dataset
-  const [initialLoading, setInitialLoading] = useState(true)
-  const [imagesLoading, setImagesLoading] = useState(true)
+  const {
+    birds,
+    initialLoading,
+    imagesLoading,
+    error,
+    hasMore,
+    loadMore,
+    filterByDateRange,
+    filterBySearch,
+    filterBySort,
+  } = useBirds()
   const [selectedId, setSelectedId] = useState<number | null>(null)
-  const [sortDirection, setSortDirection] = useState<"asc" | "desc">("desc")
-  const [dateRange, setDateRange] = useState({ start: "", end: "" })
-  const [page, setPage] = useState(1)
-  const [hasMore, setHasMore] = useState(true)
-  const ITEMS_PER_PAGE = 10
+  const [showLoader, setShowLoader] = useState(true)
 
-  // Fetch initial data
+  // Handle loader state
   useEffect(() => {
-    fetch("/api/birds")
-      .then((res) => res.json())
-      .then((data) => {
-        setAllBirds(data)
-        setFilteredBirds(data)
-        const initialBirds = data.slice(0, ITEMS_PER_PAGE)
-        setBirds(initialBirds)
-        if (initialBirds.length > 0) setSelectedId(initialBirds[0].id)
-        setHasMore(data.length > ITEMS_PER_PAGE)
-        setInitialLoading(false)
-        loadImagesForBirds(initialBirds)
-      })
-  }, [])
-
-  // Load more birds when scrolling
-  const loadMore = () => {
-    if (!imagesLoading && hasMore) {
-      setImagesLoading(true)
-      const nextBirds = filteredBirds.slice(
-        birds.length,
-        birds.length + ITEMS_PER_PAGE
-      )
-      setBirds((current) => [...current, ...nextBirds])
-      setHasMore(birds.length + nextBirds.length < filteredBirds.length)
-      loadImagesForBirds(nextBirds)
+    if (!initialLoading) {
+      const timer = setTimeout(() => {
+        setShowLoader(false)
+      }, 1500)
+      return () => clearTimeout(timer)
     }
-  }
-
-  const loadImagesForBirds = async (birdsToLoad: Bird[]) => {
-    const BATCH_SIZE = 3
-    for (let i = 0; i < birdsToLoad.length; i += BATCH_SIZE) {
-      const batch = birdsToLoad.slice(i, i + BATCH_SIZE)
-      const batchWithImages = await Promise.all(
-        batch.map(async (bird) => ({
-          ...bird,
-          imageUrl: await getWikimediaImage(bird.sciName),
-        }))
-      )
-      setBirds((current) => {
-        const updated = [...current]
-        batchWithImages.forEach((birdWithImage) => {
-          const index = updated.findIndex((b) => b.id === birdWithImage.id)
-          if (index !== -1) updated[index] = birdWithImage
-        })
-        return updated
-      })
-    }
-    setImagesLoading(false)
-  }
-
-  // Helper function to preserve image URLs when filtering
-  const preserveImageUrls = (filteredBirds: Bird[]): Bird[] => {
-    return filteredBirds.map((bird) => {
-      const existingBird =
-        birds.find((b) => b.id === bird.id) ||
-        allBirds.find((b) => b.id === bird.id)
-      return {
-        ...bird,
-        imageUrl: existingBird?.imageUrl || bird.imageUrl,
-      }
-    })
-  }
-
-  const handleSort = (direction: "asc" | "desc") => {
-    const sortedBirds = [...filteredBirds].sort((a, b) => {
-      const comparison =
-        new Date(a.dateTime).getTime() - new Date(b.dateTime).getTime()
-      return direction === "asc" ? comparison : -comparison
-    })
-    const sortedWithImages = preserveImageUrls(sortedBirds)
-    setFilteredBirds(sortedWithImages)
-    setBirds(sortedWithImages.slice(0, ITEMS_PER_PAGE))
-    setHasMore(sortedBirds.length > ITEMS_PER_PAGE)
-    setSortDirection(direction)
-  }
-
-  const handleDateRange = ({ start, end }: { start: string; end: string }) => {
-    if (!start && !end) {
-      const resetBirds = preserveImageUrls(allBirds)
-      setFilteredBirds(resetBirds)
-      setBirds(resetBirds.slice(0, ITEMS_PER_PAGE))
-      setHasMore(allBirds.length > ITEMS_PER_PAGE)
-      return
-    }
-
-    const filtered = allBirds.filter((bird) => {
-      const birdDate = new Date(bird.dateTime).getTime()
-      const startDate = start ? new Date(start).getTime() : 0
-      const endDate = end ? new Date(end).getTime() : Infinity
-      return birdDate >= startDate && birdDate <= endDate
-    })
-    const filteredWithImages = preserveImageUrls(filtered)
-    setFilteredBirds(filteredWithImages)
-    setBirds(filteredWithImages.slice(0, ITEMS_PER_PAGE))
-    setHasMore(filtered.length > ITEMS_PER_PAGE)
-  }
-
-  const handleSearch = (query: string) => {
-    if (!query) {
-      const resetBirds = preserveImageUrls(allBirds)
-      setFilteredBirds(resetBirds)
-      setBirds(resetBirds.slice(0, ITEMS_PER_PAGE))
-      setHasMore(allBirds.length > ITEMS_PER_PAGE)
-      return
-    }
-
-    const filtered = allBirds.filter(
-      (bird) =>
-        bird.name.toLowerCase().includes(query.toLowerCase()) ||
-        bird.sciName.toLowerCase().includes(query.toLowerCase())
-    )
-    const filteredWithImages = preserveImageUrls(filtered)
-    setFilteredBirds(filteredWithImages)
-    setBirds(filteredWithImages.slice(0, ITEMS_PER_PAGE))
-    setHasMore(filtered.length > ITEMS_PER_PAGE)
-  }
+  }, [initialLoading])
 
   const selectedBird = birds.find((bird) => bird.id === selectedId) || birds[0]
 
+  if (showLoader) {
+    return <RobinLoader />
+  }
+
+  if (error) {
+    return (
+      <div className="p-4 bg-red-500/10 text-red-400 rounded-lg">
+        <h2 className="text-lg font-medium mb-2">Error loading birds</h2>
+        <p className="text-sm">{error}</p>
+      </div>
+    )
+  }
+
   return (
-    <main className="bg-darkBlue text-white min-h-screen p-4 md:p-8">
-      {initialLoading ? (
-        <p>Loading birds data...</p>
-      ) : (
-        <div className="flex flex-col gap-4 w-full max-w-7xl mx-auto h-[95vh]">
-          <FilterBar
-            onSortChange={handleSort}
-            onDateRangeChange={handleDateRange}
-            onSearch={handleSearch}
-          />
-          <div className="flex flex-col md:flex-row gap-4 md:gap-6 min-h-0 flex-1">
+    <main className="h-screen bg-darkBlue text-white p-4 md:p-8">
+      <div className="h-full w-full max-w-7xl mx-auto flex flex-col">
+        <AnimatedHeader />
+        <ErrorBoundary>
+          <div className="flex-1 min-h-0 flex flex-col md:flex-row gap-4 md:gap-6">
+            <div className="md:w-80 order-2 md:order-1 flex flex-col min-h-0">
+              <div className="mb-4">
+                <FilterBar
+                  onDateRangeChange={filterByDateRange}
+                  onSearch={filterBySearch}
+                  onSortChange={filterBySort}
+                />
+              </div>
+              <div className="flex-1 min-h-0 overflow-auto">
+                <Gallery
+                  items={birds}
+                  selectedId={selectedId}
+                  onSelect={setSelectedId}
+                  loading={imagesLoading}
+                  onLoadMore={loadMore}
+                  hasMore={hasMore}
+                />
+              </div>
+            </div>
+
             {selectedBird && (
-              <div className="flex-1 order-1 md:order-2">
-                <InfoCard selectedItem={selectedBird} selectedId={selectedId} />
+              <div className="flex-1 order-1 md:order-2 min-h-0 overflow-auto">
+                <InfoCard
+                  selectedItem={selectedBird}
+                  selectedId={selectedId}
+                  allSightings={birds}
+                />
               </div>
             )}
-            <div className="h-[25vh] md:h-auto md:w-80 order-2 md:order-1">
-              <Gallery
-                items={birds}
-                selectedId={selectedId}
-                onSelect={setSelectedId}
-                loading={imagesLoading}
-                onLoadMore={loadMore}
-                hasMore={hasMore}
-              />
-            </div>
           </div>
-        </div>
-      )}
+        </ErrorBoundary>
+      </div>
     </main>
   )
 }
