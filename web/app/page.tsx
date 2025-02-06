@@ -72,7 +72,7 @@ export default function Page() {
     if (!initialLoading) {
       const timer = setTimeout(() => {
         setShowLoader(false)
-      }, 4000)
+      }, 1500)
       return () => clearTimeout(timer)
     }
   }, [initialLoading])

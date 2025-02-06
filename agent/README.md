@@ -19,8 +19,8 @@ An intelligent voice-based bird expert assistant powered by LiveKit's [Agents Fr
 1. Clone the repository and set up a virtual environment:
 
 ```console
-git clone [your-repo-url]
-cd bird-expert-agent
+git clone [repo-url]
+cd agent
 python3 -m venv venv
 source venv/bin/activate
 pip install -r requirements.txt

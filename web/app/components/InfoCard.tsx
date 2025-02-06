@@ -54,6 +54,10 @@ export default function InfoCard({
     fetchBirdInfo()
   }, [selectedItem.sciName])
 
+  if (isLoading) {
+    return <InfoCardSkeleton />
+  }
+
   return (
     <div className="h-full flex flex-col gap-4 overflow-hidden">
       {/* Bird Info Section - Fixed height with overflow */}
@@ -124,6 +128,55 @@ export default function InfoCard({
             sightingDate: selectedItem.dateTime,
           }}
         />
+      </div>
+    </div>
+  )
+}
+
+function InfoCardSkeleton() {
+  return (
+    <div className="h-full flex flex-col gap-4 overflow-hidden animate-pulse">
+      <div className="bg-gray-800/50 rounded-lg border border-gray-700/50 p-4">
+        <div className="flex flex-col md:flex-row gap-6">
+          {/* Image skeleton */}
+          <div className="w-full md:w-96 h-96 bg-gray-700/50 rounded-lg" />
+
+          {/* Info skeleton */}
+          <div className="flex-1 space-y-6">
+            {/* Title area */}
+            <div className="space-y-3">
+              <div className="h-8 w-3/4 bg-gray-700/50 rounded" />
+              <div className="h-4 w-1/2 bg-gray-700/50 rounded" />
+            </div>
+
+            {/* Details grid */}
+            <div className="grid grid-cols-2 gap-6">
+              {/* Left column */}
+              <div className="space-y-4">
+                <div className="h-6 w-1/3 bg-gray-700/50 rounded" />
+                {[...Array(3)].map((_, i) => (
+                  <div key={i} className="h-4 w-5/6 bg-gray-700/50 rounded" />
+                ))}
+              </div>
+
+              {/* Right column */}
+              <div className="space-y-4">
+                <div className="h-6 w-1/3 bg-gray-700/50 rounded" />
+                {[...Array(3)].map((_, i) => (
+                  <div key={i} className="h-4 w-5/6 bg-gray-700/50 rounded" />
+                ))}
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      {/* Chat section skeleton */}
+      <div className="flex-1 bg-gray-800/50 rounded-lg border border-gray-700/50 p-4">
+        <div className="h-full flex flex-col justify-center items-center">
+          <div className="h-8 w-8 rounded-full border-2 border-emerald-500/30 border-t-emerald-500 animate-spin" />
+          <div className="mt-4 h-5 w-32 bg-gray-700/50 rounded" />
+        </div>
       </div>
     </div>
   )

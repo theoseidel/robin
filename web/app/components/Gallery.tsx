@@ -23,12 +23,21 @@ interface GalleryProps {
 
 function LoadingSkeleton() {
   return (
-    <div className="space-y-2">
+    <div className="space-y-4">
       {[...Array(4)].map((_, i) => (
-        <div
-          key={i}
-          className="w-full aspect-square rounded-lg bg-gray-800/50 animate-pulse border border-gray-700/50"
-        />
+        <div key={i} className="animate-pulse">
+          <div className="flex gap-4 p-2 rounded-lg bg-gray-800/50 border border-gray-700/50">
+            {/* Thumbnail skeleton */}
+            <div className="w-24 h-24 rounded-lg bg-gray-700/50" />
+
+            {/* Text content skeleton */}
+            <div className="flex-1 space-y-2 py-1">
+              <div className="h-4 w-3/4 bg-gray-700/50 rounded" />
+              <div className="h-3 w-1/2 bg-gray-700/50 rounded" />
+              <div className="h-3 w-1/4 bg-gray-700/50 rounded" />
+            </div>
+          </div>
+        </div>
       ))}
     </div>
   )
